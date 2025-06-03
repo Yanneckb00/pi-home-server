@@ -96,3 +96,8 @@ sudo systemctl enable --now cockpit.socket
 sudo systemctl start cockpit
 sudo systemctl enable cockpit
 ```
+
+
+## Documentation and credits
+- https://techhut.tv/must-have-home-server-services-2025/
+- https://github.com/TechHutTV/homelab
