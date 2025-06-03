@@ -88,8 +88,11 @@ sudo dpkg-reconfigure --priority=low unattended-upgrades
 
 ```bash
 # install and auto-start cockpit
+sudo apt update -y
 sudo apt install cockpit -y
-sudo apt install cockpit-podman -y
-systemctl start cockpit
-systemctl enable cockpit
+sudo ufw allow 9090/tcp
+sudo systemctl enable --now cockpit.socket
+# or
+sudo systemctl start cockpit
+sudo systemctl enable cockpit
 ```
