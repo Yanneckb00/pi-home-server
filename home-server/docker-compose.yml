@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+      - "7575:7575"
+    volumes:
+      - ./homarr/config:/app/data/configs
+      - ./homarr/icons:/app/public/icons
+      - ./homarr/data:/data
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./jellyfin/config:/config
+      - ./jellyfin/cache:/cache
+      - ./media/:/media:ro
+
+  adguard:
+    image: adguard/adguardhome
+    container_name: adguard
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "80:80"
+      - "443:443"
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "853:853/tcp"
+      - "784:784/udp"
+      - "8853:8853/udp"
+      - "5443:5443/tcp"
+    volumes:
+      - ./adguard/work:/opt/adguardhome/work
+      - ./adguard/conf:/opt/adguardhome/conf
