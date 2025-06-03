@@ -44,7 +44,7 @@ services:
     image: vaultwarden/server:latest
     container_name: vaultwarden
     volumes:
-      - /home-server/vaultwarden:/data
+      - ./vaultwarden/data:/data
     ports:
       - "8081:80"
     restart: unless-stopped
@@ -58,3 +58,14 @@ services:
     restart: unless-stopped
     privileged: true
     network_mode: host
+
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./filebrowser/config:/config
+      - ~/:/srv
+
