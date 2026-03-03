@@ -24,6 +24,9 @@ sudo usermod -aG docker $USER  # login again or reboot
 
 # install docker compose
 sudo apt install docker-compose -y
+
+# update container
+docker compose pull <container-name> && docker compose up -d
 ```
 
 ---
