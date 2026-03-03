@@ -173,7 +173,7 @@ services:
       - SERVER_NAME=${FS_SERVER_NAME}
       - SERVER_LOCK=true
       - SERVER_TYPE=${FS_SERVER_TYPE}
-      - SERVER_URL=https://navidrome.${DUCKDNS_DOMAIN}
+      - SERVER_URL=${FS_SERVER_URL}
       - LEGACY_AUTHENTICATION=false
       - ANALYTICS_DISABLED=false
     ports:
@@ -224,7 +224,7 @@ services:
       - docmost-db
       - docmost-redis
     environment:
-      APP_URL: "https://docmost.${DUCKDNS_DOMAIN}"
+      APP_URL: ${DOCMOST_APP_URL}
       APP_SECRET: "${DOCMOST_SECRET}"
       DATABASE_URL: "${DOCMOST_DB_URL}"
       REDIS_URL: "${DOCMOST_REDIS_URL}"
@@ -233,6 +233,7 @@ services:
       - docmost_data:/app/data/storage
     networks:
       - proxy
+      - internal
     labels:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.enable=true"
@@ -255,12 +256,14 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     restart: unless-stopped
     volumes:
-      - docmost_db_data:/var/lib/postgresql/data
+      - docmost_db_data:/var/lib/postgresql
 
   docmost-redis:
     image: redis:8
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
     restart: unless-stopped
+    networks:
+      - internal
     volumes:
       - docmost_redis_data:/data"
 
@@ -294,6 +297,32 @@ services:
       - "traefik.http.services.homarr.loadbalancer.server.port=${HOMARR_PORT}"
     networks:
       - proxy
+
+  ### HOME ASSISTANT ###
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - ${HOME_SERVER_PATH}/home-assistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
+    environment:
+      TZ: ${TZ}
+    networks:
+      - proxy
+    labels:
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.enable=true"
+      - "traefik.http.routers.homeassistant-http.rule=Host(`smart.${DUCKDNS_DOMAIN}`)"
+      - "traefik.http.routers.homeassistant-http.entrypoints=http"
+      - "traefik.http.routers.homeassistant-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.homeassistant.rule=Host(`smart.${DUCKDNS_DOMAIN}`)"
+      - "traefik.http.routers.homeassistant.entrypoints=https"
+      - "traefik.http.routers.homeassistant.tls=true"
+      - "traefik.http.routers.homeassistant.tls.certresolver=letsencrypt"
+      - "traefik.http.services.homeassistant.loadbalancer.server.port=${HOME_ASSISTANT_PORT}"
 
   ### BEETS - Music Management ###
   beets:
