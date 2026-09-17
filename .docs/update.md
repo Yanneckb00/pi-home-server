@@ -9,8 +9,10 @@ sudo apt update && sudo apt upgrade -y
 ```
 
 ### Cleanup & Update Docker
+
+#### Check Docker
+
 ```bash
-### Check Docker ###
 sudo docker ps -a
 sudo docker images
 sudo docker volume ls
@@ -25,8 +27,10 @@ sudo docker image prune -a
 
 # remove unused networks
 sudo docker network prune
+```
 
-### Update Docker Container ###
+#### Update Docker Container
+```bash
 # cd into directory and run:
 sudo docker compose pull
 sudo docker compose up -d --remove-orphans
